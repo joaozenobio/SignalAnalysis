@@ -32,7 +32,7 @@ class Autoencoder:
         plot_model(self.model)
 
     def fit(self, data, epochs=10, batch_size=1, verbose=1):
-        self.model.fit(data, data, epochs, batch_size, verbose)
+        self.model.fit(x=data, y=data, epochs=epochs, batch_size=batch_size, verbose=verbose)
 
     def save(self):
         self.model.save('./model')

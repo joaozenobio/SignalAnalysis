@@ -7,6 +7,10 @@ from matplotlib.pyplot import cm
 import matplotlib.pyplot as plt
 import numpy as np
 import os
+import hdbscan
+from sklearn.cluster import OPTICS
+
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 palleteColors = ["#80ff72", "#8af3ff", "#7ee8fa", "#89043d", "#023c40", "#c3979f", "#797270", "#c57b57", "#07004d",
                  "#0e7c7b", "#c33149", "#f49e4c", "#2e4057", "#f2d7ee", "#bfb48f", "#a5668b", "#002500", "#720e07",
@@ -87,30 +91,37 @@ print("\nPerforming experiments in dataset\n")
 
 data = Dataset("signals").data
 
-print(data)
+print(data.shape)
 
 model = Autoencoder(data)
 model.fit(data)
 model.save()
 prediction = model.predict(data)
 
-# # Running tests
-# for m in listOfMClSize:
-#     print("--------------------------------------- MCLSIZE = %d ---------------------------------------" % m)
-#
-#     for lm in methodsLinkage:
-#
-#         titlePlot = lm + " and mClSize = " + str(m)
-#         savePath = "output/" + lm + "-" + str(m) + ".png"
-#         saveDendrogram = "dendrograms/dendrogram-" + lm + "-mClSize-" + str(m) + ".png"
-#
-#         print("Using linkage method %s" % lm)
-#         Z = linkage(prediction, method=lm, metric="euclidean")
-#
-#         foscFramework = FOSC(Z, mClSize=m)
-#         infiniteStability = foscFramework.propagateTree()
-#         partition = foscFramework.findProminentClusters(1, infiniteStability)
-#
-#         # Plot results
-#         #plotPartition(mat[:,0], mat[:,1], partition, titlePlot, savePath)
-#         plotDendrogram(Z, partition, titlePlot, saveDendrogram)
+method = OPTICS().fit(data)
+print(method.labels_)
+
+method = hdbscan.HDBSCAN()
+method.fit(prediction)
+print(method.labels_)
+
+# Running tests
+for m in listOfMClSize:
+    print("--------------------------------------- MCLSIZE = %d ---------------------------------------" % m)
+
+    for lm in methodsLinkage:
+
+        titlePlot = lm + " and mClSize = " + str(m)
+        savePath = "output/" + lm + "-" + str(m) + ".png"
+        saveDendrogram = "dendrograms/dendrogram-" + lm + "-mClSize-" + str(m) + ".png"
+
+        print("Using linkage method %s" % lm)
+        Z = linkage(prediction, method=lm, metric="euclidean")
+
+        foscFramework = FOSC(Z, mClSize=m)
+        infiniteStability = foscFramework.propagateTree()
+        partition = foscFramework.findProminentClusters(1, infiniteStability)
+
+        # Plot results
+        # plotPartition(mat[:,0], mat[:,1], partition, titlePlot, savePath)
+        plotDendrogram(Z, partition, titlePlot, saveDendrogram)
