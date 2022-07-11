@@ -34,12 +34,11 @@ class Autoencoder:
     def fit(self, data, epochs=10, batch_size=1, verbose=1):
         self.model.fit(x=data, y=data, epochs=epochs, batch_size=batch_size, verbose=verbose)
 
-    def save(self):
-        self.model.save('./model')
+    def save(self, directory):
+        self.model.save(f'./{directory}')
 
-    @staticmethod
-    def load():
-        return load_model('./model')
+    def load(self, directory):
+        self.model = load_model(f'./{directory}')
 
     def predict(self, data):
         encoder = Model(inputs=self.model.inputs, outputs=self.model.layers[3].output)

@@ -9,7 +9,14 @@ import numpy as np
 import os
 import hdbscan
 from sklearn.cluster import OPTICS
+from sklearn.cluster import DBSCAN
+import sys
+from sklearn.metrics import mean_squared_error
+from sklearn.manifold import TSNE
+import plotly.express as px
+import pandas as pd
 
+sys.setrecursionlimit(10000)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 palleteColors = ["#80ff72", "#8af3ff", "#7ee8fa", "#89043d", "#023c40", "#c3979f", "#797270", "#c57b57", "#07004d",
@@ -84,22 +91,27 @@ def plotDendrogram(Z, result, title, saveDescription=None):
 
 #### ############################################  Main script #########################################################
 
-listOfMClSize = [100]
+listOfMClSize = [25, 50, 100, 200, 300]
 methodsLinkage = ["single", "average", "ward", "complete", "weighted"]
 
 print("\nPerforming experiments in dataset\n")
 
 data = Dataset("signals").data
 
-print(data.shape)
-
-# model = Autoencoder(data)
+model = Autoencoder(data)
 # model.fit(data)
-# model.save()
-model = Autoencoder.load()
+# model.save("model2")
+model.load("model")
 prediction = model.predict(data)
 
-print(prediction.shape)
+modProjecao = TSNE(n_components=2, learning_rate='auto', init='random')
+projecao2D = modProjecao.fit_transform(prediction)
+clustering = DBSCAN(eps=2).fit(projecao2D)
+projecao2D = pd.DataFrame(projecao2D)
+projecao2D["cluster"] = clustering.labels_
+projecao2D["label"] = list(range(prediction.shape[0]))
+fig = px.scatter(projecao2D, x=0, y=1, color="cluster", labels="label", hover_data=["label"])
+fig.show()
 
 method = OPTICS().fit(prediction)
 print(method.labels_)
@@ -121,10 +133,11 @@ for m in listOfMClSize:
         print("Using linkage method %s" % lm)
         Z = linkage(prediction, method=lm, metric="euclidean")
 
+        print("Start FOSC")
         foscFramework = FOSC(Z, mClSize=m)
         infiniteStability = foscFramework.propagateTree()
         partition = foscFramework.findProminentClusters(1, infiniteStability)
 
-        # Plot results
+        print("Plotting results")
         # plotPartition(mat[:,0], mat[:,1], partition, titlePlot, savePath)
         plotDendrogram(Z, partition, titlePlot, saveDendrogram)
