@@ -37,8 +37,9 @@ class Autoencoder:
     def save(self):
         self.model.save('./model')
 
-    def load(self):
-        self.model = load_model('./model')
+    @staticmethod
+    def load():
+        return load_model('./model')
 
     def predict(self, data):
         encoder = Model(inputs=self.model.inputs, outputs=self.model.layers[3].output)

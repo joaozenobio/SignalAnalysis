@@ -93,12 +93,15 @@ data = Dataset("signals").data
 
 print(data.shape)
 
-model = Autoencoder(data)
-model.fit(data)
-model.save()
+# model = Autoencoder(data)
+# model.fit(data)
+# model.save()
+model = Autoencoder.load()
 prediction = model.predict(data)
 
-method = OPTICS().fit(data)
+print(prediction.shape)
+
+method = OPTICS().fit(prediction)
 print(method.labels_)
 
 method = hdbscan.HDBSCAN()
