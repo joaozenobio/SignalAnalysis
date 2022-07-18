@@ -29,10 +29,10 @@ TSNE_2D = modProjecao.fit_transform(prediction)
 TSNE_2D = pd.DataFrame(TSNE_2D)
 TSNE_2D["label"] = list(range(prediction.shape[0]))
 
-optics_results = OPTICS(min_samples=15).fit(prediction)
+optics_results = OPTICS(min_cluster_size=50).fit(prediction)
 TSNE_2D["OPTICS"] = optics_results.labels_
 
-hdbscan_results = hdbscan.HDBSCAN(min_cluster_size=15)
+hdbscan_results = hdbscan.HDBSCAN(min_cluster_size=50)
 hdbscan_results.fit(prediction)
 TSNE_2D["HDBSCAN"] = hdbscan_results.labels_
 
