@@ -14,6 +14,8 @@ class Autoencoder:
         self.model = Sequential()
         self.model.add(Input(shape=(data.shape[1], data.shape[2])))
         self.model.add(LSTM(90, activation="sigmoid", return_sequences=True))
+        self.model.add(LSTM(120, activation="sigmoid", return_sequences=True))
+        self.model.add(LSTM(90, activation="sigmoid", return_sequences=True))
         self.model.add(LSTM(70, activation="sigmoid", return_sequences=True))
         self.model.add(LSTM(50, activation="sigmoid", return_sequences=True))
         self.model.add(LSTM(20, activation="sigmoid"))
@@ -21,6 +23,8 @@ class Autoencoder:
         self.model.add(LSTM(20, activation="sigmoid", return_sequences=True))
         self.model.add(LSTM(50, activation="sigmoid", return_sequences=True))
         self.model.add(LSTM(70, activation="sigmoid", return_sequences=True))
+        self.model.add(LSTM(90, activation="sigmoid", return_sequences=True))
+        self.model.add(LSTM(120, activation="sigmoid", return_sequences=True))
         self.model.add(LSTM(90, activation="sigmoid", return_sequences=True))
         self.model.add(TimeDistributed(Dense(data.shape[1])))
         self.model.compile(loss="mse", optimizer="adam")
@@ -41,5 +45,5 @@ class Autoencoder:
         self.model = load_model(f'./{directory}')
 
     def predict(self, data):
-        encoder = Model(inputs=self.model.inputs, outputs=self.model.layers[3].output)
+        encoder = Model(inputs=self.model.inputs, outputs=self.model.layers[5].output)
         return encoder.predict(data)
