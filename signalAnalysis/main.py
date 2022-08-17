@@ -5,11 +5,19 @@ from Autoencoder import Autoencoder
 import hdbscan
 from sklearn.cluster import OPTICS
 from sklearn.manifold import TSNE
-
 import os
 import sys
 import plotly.express as px
 import pandas as pd
+
+# TODO:
+#  Report
+#  for + Reachability plot OPTICS
+#  for + Dendrogram HDBSCAN
+#  for + Dendrogram FOSC
+#  Print example "result_..." in TSNE 2D
+#  Calculate metrics
+#  Train YOLO with new images
 
 sys.setrecursionlimit(10000)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -29,10 +37,10 @@ TSNE_2D = modProjecao.fit_transform(prediction)
 TSNE_2D = pd.DataFrame(TSNE_2D)
 TSNE_2D["label"] = list(range(prediction.shape[0]))
 
-optics_results = OPTICS(min_cluster_size=100).fit(prediction)
+optics_results = OPTICS(min_samples=5, min_cluster_size=5).fit(prediction)
 TSNE_2D["OPTICS"] = optics_results.labels_
 
-hdbscan_results = hdbscan.HDBSCAN(min_cluster_size=100)
+hdbscan_results = hdbscan.HDBSCAN(min_samples=5, min_cluster_size=5)
 hdbscan_results.fit(prediction)
 TSNE_2D["HDBSCAN"] = hdbscan_results.labels_
 
@@ -48,11 +56,6 @@ for m in listOfMClSize:
         partition = foscFramework.findProminentClusters(1, infiniteStability)
         TSNE_2D[f"FOSC_{m}_{lm}"] = partition
 
-optics_results_fig = px.scatter(TSNE_2D, x=0, y=1, color="OPTICS", labels="label", hover_data=["label"])
-optics_results_fig.write_image(f"./results/OPTICS.jpeg")
-hdbscan_results_fig = px.scatter(TSNE_2D, x=0, y=1, color="HDBSCAN", labels="label", hover_data=["label"])
-hdbscan_results_fig.write_image(f"./results/HDBSCAN.jpeg")
 for m in listOfMClSize:
     for lm in methodsLinkage:
-        hdbscan_results_fig = px.scatter(TSNE_2D, x=0, y=1, color=f"FOSC_{m}_{lm}", labels="label", hover_data=["label"])
-        hdbscan_results_fig.write_image(f"./results/FOSC_{m}_{lm}.jpeg")
+        pass
