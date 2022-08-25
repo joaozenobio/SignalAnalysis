@@ -25,6 +25,6 @@ class Dataset:
 
         data = data.diff(axis=1).drop(columns=0)
 
-        data = minmax_scale(data.values)
+        data = minmax_scale(data.values, feature_range=(-1, 1), axis=1)
 
         self.data = data.reshape(data.shape[0], data.shape[1], 1)
