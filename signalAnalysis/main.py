@@ -131,10 +131,12 @@ os.makedirs("./results", exist_ok=True)
 
 dataset = Dataset("signals")
 
-model = Autoencoder(dataset.data)
-model.fit(dataset.data)
-model.save("model3")
-model.load("model3")
+# model = Autoencoder(dataset.data)
+# model.fit(dataset.data)
+# model.save("model5")
+
+model = Autoencoder()
+model.load("model4")
 prediction = model.predict(dataset.data)
 
 tsne_results = TSNE(n_components=2, learning_rate='auto', init='random')

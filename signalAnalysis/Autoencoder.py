@@ -10,7 +10,13 @@ from keras.models import Model
 
 
 class Autoencoder:
-    def __init__(self, data):
+    def __init__(self, data=None):
+        if data is not None:
+            self.build_autoencoder(data)
+        else:
+            self.model = None
+
+    def build_autoencoder(self, data):
         self.model = Sequential()
         self.model.add(LSTM(90, activation="sigmoid", return_sequences=True, input_shape=(data.shape[1], data.shape[2])))
         self.model.add(LSTM(120, activation="sigmoid", return_sequences=True))
@@ -25,7 +31,7 @@ class Autoencoder:
         self.model.add(LSTM(90, activation="sigmoid", return_sequences=True))
         self.model.add(LSTM(70, activation="sigmoid", return_sequences=True))
         self.model.add(LSTM(50, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(20, activation="sigmoid"))
+        self.model.add(LSTM(20, activation="sigmoid", name='decoder_output'))
         self.model.add(RepeatVector(data.shape[1]))
         self.model.add(LSTM(20, activation="sigmoid", return_sequences=True))
         self.model.add(LSTM(30, activation="sigmoid", return_sequences=True))
@@ -57,5 +63,5 @@ class Autoencoder:
         self.model = load_model(f'./{directory}')
 
     def predict(self, data):
-        encoder = Model(inputs=self.model.inputs, outputs=self.model.layers[5].output)
+        encoder = Model(inputs=self.model.inputs, outputs=self.model.get_layer("encoder_output").output)
         return encoder.predict(data)
