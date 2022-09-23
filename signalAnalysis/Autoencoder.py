@@ -1,5 +1,4 @@
 from keras.models import Sequential
-from keras.layers import Input
 from keras.layers import LSTM, Dropout
 from keras.layers import RepeatVector
 from keras.layers import TimeDistributed
