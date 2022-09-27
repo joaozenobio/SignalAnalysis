@@ -21,7 +21,7 @@ class Dataset:
 
         data = pd.DataFrame(segmented_signals).reset_index(drop=True)
         data = data.diff(axis=1).drop(columns=0)
-        data = minmax_scale(data.values, feature_range=(-1, 1), axis=1)
+        data = minmax_scale(data.values, feature_range=(0, 1), axis=1)
         self.data = data.reshape(data.shape[0], data.shape[1], 1)
 
     @staticmethod
@@ -35,6 +35,6 @@ class Dataset:
 
         data = pd.DataFrame(segmented_signal).reset_index(drop=True)
         data = data.diff(axis=1).drop(columns=0)
-        data = minmax_scale(data.values, feature_range=(-1, 1), axis=1)
+        data = minmax_scale(data.values, feature_range=(0, 1), axis=1)
         data = data.reshape(data.shape[0], data.shape[1], 1)
         return data

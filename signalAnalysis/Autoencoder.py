@@ -30,7 +30,7 @@ class Autoencoder:
         self.model.add(LSTM(90, activation="sigmoid", return_sequences=True))
         self.model.add(LSTM(70, activation="sigmoid", return_sequences=True))
         self.model.add(LSTM(50, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(20, activation="sigmoid", name='decoder_output'))
+        self.model.add(LSTM(20, activation="sigmoid", name='encoder_output'))
         self.model.add(RepeatVector(data.shape[1]))
         self.model.add(LSTM(20, activation="sigmoid", return_sequences=True))
         self.model.add(LSTM(30, activation="sigmoid", return_sequences=True))

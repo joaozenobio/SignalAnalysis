@@ -1,6 +1,3 @@
-from Autoencoder import Autoencoder
-from Dataset import Dataset
-
 import pandas as pd
 import numpy as np
 import os
@@ -73,12 +70,6 @@ os.makedirs("./gifs", exist_ok=True)
 prediction = np.load("results/prediction.npy")
 results = pd.read_csv("results/results.csv", index_col=0)
 
-processed_signal = Dataset.process_signal("result_aJdKrfM.csv")
-
-model = Autoencoder()
-model.load("model4")
-observation_prediction = model.predict(processed_signal)
-
 print('Creating report')
 
 report = pd.DataFrame(columns=["Method", "PB", "AUCC", "Silhouette", "Noise", "Penalty"])
@@ -96,25 +87,21 @@ report.to_csv(f"report/report.csv")
 print('Creating gif')
 
 tsne_results = TSNE(n_components=2, learning_rate='auto', init='random', perplexity=50)
-tsne_2d = tsne_results.fit_transform(np.vstack([prediction, observation_prediction]))
-prediction_2d = tsne_2d[:-len(observation_prediction)]
-observation_prediction_2d = tsne_2d[-len(observation_prediction):]
+tsne_2d = tsne_results.fit_transform(prediction)
 
 method = "HDBSCAN_5"
 labels = results[method].values
 
-fig, ax = plt.subplots(figsize=(15, 15))
-ax.scatter(prediction_2d[:, 0], prediction_2d[:, 1], c=labels, cmap=mpl.colormaps["hsv"])
-for i in range(observation_prediction_2d.shape[0]-1):
-    x = observation_prediction_2d[i, 0]
-    y = observation_prediction_2d[i, 1]
-    x2 = observation_prediction_2d[i+1, 0]
-    y2 = observation_prediction_2d[i+1, 1]
-    ax.quiver(x, y, x2-x, y2-y, scale_units='xy', angles='xy', scale=1)
-    plt.savefig(f'gif/{method}_{i}.png', dpi=100)
-plt.close(fig)
+last_video_signal_len = 20
 
-with imageio.get_writer(f"gifs/{method}.gif", mode="I", duration=1) as writer:
+for i in range(len(prediction)-last_video_signal_len, len(prediction)):
+    fig, ax = plt.subplots(figsize=(15, 15))
+    coloring = [1 if label == labels[i] else 0 for label in labels]
+    ax.scatter(tsne_2d[:, 0], tsne_2d[:, 1], c=coloring)
+    plt.savefig(f'gif/{method}_{i}.png', dpi=100)
+    plt.close(fig)
+
+with imageio.get_writer(f"gifs/{method}.gif", mode="I", duration=1/3) as writer:
     for filename in sorted(glob.glob("gif/*.png")):
         image = imageio.imread(filename)
         writer.append_data(image)
