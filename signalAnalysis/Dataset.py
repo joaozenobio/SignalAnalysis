@@ -7,17 +7,22 @@ from sklearn.preprocessing import minmax_scale
 class Dataset:
     def __init__(self):
         self.data = None
+        self.videos_starting_point = []
 
     def dataset(self, data_directory):
         signals = []
-        for file in glob.glob(f"{data_directory}/*.csv"):
+        for file in sorted(glob.glob(f"{data_directory}/*.csv")):
             signals.append(pd.read_csv(file, index_col=0).squeeze("columns"))
 
         segmented_signals = []
+        video_starting_point = 0
         for signal in signals:
+            self.videos_starting_point.append(video_starting_point)
             for i in range(0, len(signal)-89, 10):
                 partition = signal[i:i+90].reset_index(drop=True)
                 segmented_signals.append(partition)
+                video_starting_point += 1
+        self.videos_starting_point.append(len(segmented_signals))
 
         data = pd.DataFrame(segmented_signals).reset_index(drop=True)
         data = data.diff(axis=1).drop(columns=0)

@@ -1,3 +1,5 @@
+from Dataset import Dataset
+
 import pandas as pd
 import numpy as np
 import os
@@ -8,7 +10,6 @@ from scipy.spatial.distance import squareform
 from scipy.stats import pointbiserialr
 from sklearn.metrics import roc_auc_score, silhouette_score
 
-import matplotlib as mpl
 import matplotlib.pyplot as plt
 import imageio
 
@@ -92,10 +93,12 @@ tsne_2d = tsne_results.fit_transform(prediction)
 method = "HDBSCAN_5"
 labels = results[method].values
 
-last_video_signal_len = 20
+dataset = Dataset()
+dataset.dataset("signals")
 
-for i in range(len(prediction)-last_video_signal_len, len(prediction)):
+for i in range(dataset.videos_starting_point[-2], dataset.videos_starting_point[-1]):
     fig, ax = plt.subplots(figsize=(15, 15))
+    ax.set_title(f"Frame {i}")
     coloring = [1 if label == labels[i] else 0 for label in labels]
     ax.scatter(tsne_2d[:, 0], tsne_2d[:, 1], c=coloring)
     plt.savefig(f'gif/{method}_{i}.png', dpi=100)
