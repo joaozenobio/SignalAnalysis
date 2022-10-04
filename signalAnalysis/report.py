@@ -71,15 +71,15 @@ os.makedirs("./gifs", exist_ok=True)
 prediction = np.load("results/prediction.npy")
 results = pd.read_csv("results/results.csv", index_col=0)
 
-print('Creating report')
-
-report = pd.DataFrame(columns=["Method", "PB", "AUCC", "Silhouette", "Noise", "Penalty"])
-
-for method in results.columns:
-    labels = results[method].values
-    report.loc[len(report)] = [method] + list(evaluate(prediction, labels))
-
-report.to_csv(f"report/report.csv")
+# print('Creating report')
+#
+# report = pd.DataFrame(columns=["Method", "PB", "AUCC", "Silhouette", "Noise", "Penalty"])
+#
+# for method in results.columns:
+#     labels = results[method].values
+#     report.loc[len(report)] = [method] + list(evaluate(prediction, labels))
+#
+# report.to_csv(f"report/report.csv")
 
 
 # TODO: AKS JADSON HOW TO DECIDE THE BEST METHOD FROM THE METRICS
@@ -96,15 +96,21 @@ labels = results[method].values
 dataset = Dataset()
 dataset.dataset("signals")
 
-for i in range(dataset.videos_starting_point[-2], dataset.videos_starting_point[-1]):
-    fig, ax = plt.subplots(figsize=(15, 15))
-    ax.set_title(f"Frame {i}")
-    coloring = [1 if label == labels[i] else 0 for label in labels]
-    ax.scatter(tsne_2d[:, 0], tsne_2d[:, 1], c=coloring)
-    plt.savefig(f'gif/{method}_{i}.png', dpi=100)
-    plt.close(fig)
+i = dataset.videos_starting_point[-1]
+fig, ax = plt.subplots(figsize=(15, 15))
+ax.scatter(tsne_2d[:, 0], tsne_2d[:, 1], c=labels)
+plt.savefig(f'report/{method}_{i}.png', dpi=100)
+plt.close(fig)
 
-with imageio.get_writer(f"gifs/{method}.gif", mode="I", duration=1/3) as writer:
-    for filename in sorted(glob.glob("gif/*.png")):
-        image = imageio.imread(filename)
-        writer.append_data(image)
+# for i in range(dataset.videos_starting_point[-2], dataset.videos_starting_point[-1]):
+#     fig, ax = plt.subplots(figsize=(15, 15))
+#     ax.set_title(f"Frame {i}")
+#     coloring = [1 if label == labels[i] else 0 for label in labels]
+#     ax.scatter(tsne_2d[:, 0], tsne_2d[:, 1], c=coloring)
+#     plt.savefig(f'gif/{method}_{i}.png', dpi=100)
+#     plt.close(fig)
+#
+# with imageio.get_writer(f"gifs/{method}.gif", mode="I", duration=1/3) as writer:
+#     for filename in sorted(glob.glob("gif/*.png")):
+#         image = imageio.imread(filename)
+#         writer.append_data(image)

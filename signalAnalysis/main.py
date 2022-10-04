@@ -30,7 +30,7 @@ dataset.dataset("signals")
 # !!! save() writes last model in the same folder !!!
 # model = Autoencoder(dataset.data)
 # model.fit(dataset.data)
-# model.save("model2")
+# model.save("model")
 
 model = Autoencoder()
 model.load("model")
@@ -38,26 +38,26 @@ prediction = model.predict(dataset.data)
 np.save("results/prediction.npy", prediction)
 
 df = pd.DataFrame()
-# , 7, 9, 11, 13, 15, 17, 19, 21, 23, 25]
-listOfMClSize = [5]
+
+listOfMClSize = [5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25]
 for m in listOfMClSize:
     print(f"listOfMClSize = {m}")
 
-    # print("HDBSCAN")
-    # hdbscan_results = hdbscan.HDBSCAN(min_cluster_size=m)
-    # hdbscan_results.fit(prediction)
-    #
-    # if -1 in hdbscan_results.labels_:
-    #     hdbscan_results.labels_ = np.array(hdbscan_results.labels_)
-    #     hdbscan_results.labels_ += 1
-    #
+    print("HDBSCAN")
+    hdbscan_results = hdbscan.HDBSCAN(min_cluster_size=m)
+    hdbscan_results.fit(prediction)
+
+    if -1 in hdbscan_results.labels_:
+        hdbscan_results.labels_ = np.array(hdbscan_results.labels_)
+        hdbscan_results.labels_ += 1
+
     # fig, ax = plt.subplots()
     # fig.set_size_inches(15, 15)
     # hdbscan_results.condensed_tree_.plot(log_size=True)
     # plt.savefig(f'results/HDBSCAN_{m}.png', dpi=100)
     # plt.close(fig)
-    #
-    # df[f"HDBSCAN_{m}"] = list(hdbscan_results.labels_)
+
+    df[f"HDBSCAN_{m}"] = list(hdbscan_results.labels_)
 
     print("OPTICS")
     optics_results = OPTICS(min_cluster_size=m).fit(prediction)
