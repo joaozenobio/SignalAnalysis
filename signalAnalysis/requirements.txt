@@ -7,3 +7,5 @@ numpy
 matplotlib
 seaborn
 imageio
+pydot
+graphviz

@@ -50,7 +50,8 @@ class Autoencoder:
         print(self.model.summary())
 
     def plot_model(self):
-        plot_model(self.model)
+        plot_model(self.model, show_shapes=True, show_dtype=True, show_layer_names=False, expand_nested=True,
+                   show_layer_activations=True)
 
     def fit(self, data, epochs=10, batch_size=1, verbose=1):
         self.model.fit(x=data, y=data, epochs=epochs, batch_size=batch_size, verbose=verbose)

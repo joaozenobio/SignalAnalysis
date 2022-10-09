@@ -10,7 +10,6 @@ import pandas as pd
 import numpy as np
 
 from scipy.cluster.hierarchy import linkage, dendrogram
-import matplotlib.pyplot as plt
 
 sys.setrecursionlimit(10000)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -39,62 +38,36 @@ np.save("results/prediction.npy", prediction)
 
 df = pd.DataFrame()
 
-listOfMClSize = [5, 7, 9, 11, 13, 15, 17, 19, 21, 23, 25]
-for m in listOfMClSize:
-    print(f"listOfMClSize = {m}")
+min_cluster_sizes = [32, 48, 64, 96, 128, 192, 256]
+min_samples = [2, 3, 5, 8, 13]
+for min_cluster_size in min_cluster_sizes:
+    for min_sample in min_samples:
 
-    print("HDBSCAN")
-    hdbscan_results = hdbscan.HDBSCAN(min_cluster_size=m)
-    hdbscan_results.fit(prediction)
+        print(f"HDBSCAN_{min_sample}_{min_cluster_size}")
+        hdbscan_results = hdbscan.HDBSCAN(min_cluster_size=min_cluster_size, min_samples=min_sample)
+        hdbscan_results.fit(prediction)
+        if -1 in hdbscan_results.labels_:
+            hdbscan_results.labels_ = np.array(hdbscan_results.labels_)
+            hdbscan_results.labels_ += 1
+        df[f"HDBSCAN_{min_sample}_{min_cluster_size}"] = list(hdbscan_results.labels_)
 
-    if -1 in hdbscan_results.labels_:
-        hdbscan_results.labels_ = np.array(hdbscan_results.labels_)
-        hdbscan_results.labels_ += 1
+        print(f"OPTICS_{min_sample}_{min_cluster_size}")
+        optics_results = OPTICS(min_cluster_size=min_cluster_size, min_samples=min_sample).fit(prediction)
+        if -1 in optics_results.labels_:
+            optics_results.labels_ = np.array(optics_results.labels_)
+            optics_results.labels_ += 1
+        df[f"OPTICS_{min_sample}_{min_cluster_size}"] = list(optics_results.labels_)
 
-    # fig, ax = plt.subplots()
-    # fig.set_size_inches(15, 15)
-    # hdbscan_results.condensed_tree_.plot(log_size=True)
-    # plt.savefig(f'results/HDBSCAN_{m}.png', dpi=100)
-    # plt.close(fig)
-
-    df[f"HDBSCAN_{m}"] = list(hdbscan_results.labels_)
-
-    print("OPTICS")
-    optics_results = OPTICS(min_cluster_size=m).fit(prediction)
-    # reachability = optics_results.reachability_[optics_results.ordering_]
-
-    if -1 in optics_results.labels_:
-        optics_results.labels_ = np.array(optics_results.labels_)
-        optics_results.labels_ += 1
-
-    # fig, ax = plt.subplots()
-    # fig.set_size_inches(15, 15)
-    # ax.plot(reachability)
-    # plt.savefig(f'results/OPTICS_{m}.png', dpi=100)
-    # plt.close(fig)
-
-    df[f"OPTICS_{m}"] = list(optics_results.labels_)
-
-    methodsLinkage = ["single", "average", "ward", "complete", "weighted"]
-    for lm in methodsLinkage:
-        print(f"FOSC - {lm}")
-        titlePlot = lm + " and mClSize = " + str(m)
-        Z = linkage(prediction, method=lm, metric="euclidean")
-        foscFramework = FOSC(Z, mClSize=m)
-        infiniteStability = foscFramework.propagateTree()
-        labels_ = foscFramework.findProminentClusters(1, infiniteStability)
-
+    linkage_methods = ["single", "average", "ward", "complete", "weighted"]
+    for linkage_method in linkage_methods:
+        print(f"FOSC_{linkage_method}_{min_cluster_size}")
+        Z = linkage(prediction, method=linkage_method, metric="euclidean")
+        fosc_framework = FOSC(Z, mClSize=min_cluster_size)
+        infinite_stability = fosc_framework.propagateTree()
+        labels_ = fosc_framework.findProminentClusters(1, infinite_stability)
         if -1 in labels_:
             labels_ = np.array(labels_)
             labels_ += 1
-
-        # fig = plt.figure(figsize=(15, 15))
-        # dn = dendrogram(Z=Z, color_threshold=None, leaf_font_size=5, leaf_rotation=45)
-        # plt.savefig(f"results/FOSC_{m}_{lm}.png")
-        # plt.close(fig)
-
-        df[f"FOSC_{m}_{lm}"] = list(labels_)
-
-    print("-------------")
+        df[f"FOSC_{min_cluster_size}_{linkage_method}"] = list(labels_)
 
 df.to_csv(f"results/results.csv")
