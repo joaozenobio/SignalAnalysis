@@ -67,13 +67,12 @@ def evaluate(prediction, labels):
 
 
 os.makedirs("./report", exist_ok=True)
-os.makedirs("./gif", exist_ok=True)
-os.makedirs("./gifs", exist_ok=True)
+os.makedirs("./conrado", exist_ok=True)
 
 prediction = np.load("results/prediction.npy")
 results = pd.read_csv("results/results.csv", index_col=0)
 
-# print('Creating report')
+# print('Reporting')
 # report = pd.DataFrame(columns=["Method", "PB", "AUCC", "Silhouette", "Noise", "Penalty"])
 # for method in results.columns:
 #     labels = results[method].values
@@ -110,23 +109,18 @@ for method in [max1[0], max2[0], max3[0]]:
     plt.savefig(f'report/{method}.png', dpi=100)
     plt.close(fig)
 
+print('Conrado')
 dataset = Dataset()
 dataset.dataset('signals')
-labels = results[method].values
 for method in [max1[0], max2[0], max3[0]]:
+    labels = results[method].values
     for cluster in set(labels):
         data = dataset.original_data.iloc[[True if label == cluster else False for label in labels]]
         data = data.reset_index(drop=True).values
-        fig, ax = plt.subplots(3, 3)
-        rand_index = np.floor(np.linspace(0, data.shape[0]-1, 9))
-        ax[0, 0].plot(data[int(rand_index[0])])
-        ax[0, 1].plot(data[int(rand_index[1])])
-        ax[0, 2].plot(data[int(rand_index[2])])
-        ax[1, 0].plot(data[int(rand_index[3])])
-        ax[1, 1].plot(data[int(rand_index[4])])
-        ax[1, 2].plot(data[int(rand_index[5])])
-        ax[2, 0].plot(data[int(rand_index[6])])
-        ax[2, 1].plot(data[int(rand_index[7])])
-        ax[2, 2].plot(data[int(rand_index[8])])
+        side_size = 6
+        fig, ax = plt.subplots(side_size, side_size, figsize=(30, 30))
+        rand_index = np.floor(np.linspace(0, data.shape[0]-1, side_size**2))
+        for i in range(side_size**2):
+            ax[int(np.floor(i / side_size)), int(i % side_size)].plot(data[int(rand_index[i])])
         plt.savefig(f'conrado/{method}_label_{cluster}.png', dpi=100)
         plt.close()
