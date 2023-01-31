@@ -73,11 +73,12 @@ prediction = np.load("results/prediction.npy")
 results = pd.read_csv("results/results.csv", index_col=0)
 
 # print('Reporting')
-# report = pd.DataFrame(columns=["Method", "PB", "AUCC", "Silhouette", "Noise", "Penalty"])
-# for method in results.columns:
-#     labels = results[method].values
-#     report.loc[len(report)] = [method] + list(evaluate(prediction, labels))
-# report.to_csv(f"report/report.csv")
+report = pd.DataFrame(columns=["Method", "PB", "AUCC", "Silhouette", "Noise", "Penalty"])
+for method in results.columns:
+    labels = results[method].values
+    print([method] + list(evaluate(prediction, labels)))
+    report.loc[len(report)] = [method] + list(evaluate(prediction, labels))
+report.to_csv(f"report/report.csv")
 
 df = pd.read_csv('report/report.csv', index_col=0)[['Method', 'AUCC', 'Silhouette']]
 max1, max2, max3 = ('', 0), ('', 0), ('', 0)

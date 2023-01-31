@@ -9,3 +9,5 @@ seaborn
 imageio
 pydot
 graphviz
+joblib
+tensorflow

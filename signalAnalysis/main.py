@@ -14,13 +14,6 @@ from scipy.cluster.hierarchy import linkage, dendrogram
 sys.setrecursionlimit(10000)
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
-
-# TODO:
-#   Report
-#   REPTILERECON -> Train YOLO with new images
-#   Documentation
-
-
 os.makedirs("./results", exist_ok=True)
 
 dataset = Dataset()
@@ -38,7 +31,7 @@ np.save("results/prediction.npy", prediction)
 
 df = pd.DataFrame()
 
-min_cluster_sizes = [32, 48, 64, 96, 128, 192, 256]
+min_cluster_sizes = [5]
 min_samples = [2, 3, 5, 8, 13]
 for min_cluster_size in min_cluster_sizes:
     for min_sample in min_samples:
