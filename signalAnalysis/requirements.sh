@@ -5,4 +5,4 @@ echo 'export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:$CONDA_PREFIX/lib/' > $CONDA_PREFI
 pip install --upgrade pip
 pip install -r requirements.txt
 
-cp ~/anaconda3/envs/SignalAnalysis/lib/libdevice.10.bc .
+cp $CONDA_PREFIX/lib/libdevice.10.bc .
