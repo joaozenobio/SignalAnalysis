@@ -10,30 +10,29 @@ import pandas as pd
 import numpy as np
 
 
-def run(make_model=False):
+def run(model_path=None):
     sys.setrecursionlimit(10000)
     os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
     os.makedirs("./results", exist_ok=True)
 
     dataset = Dataset()
-    dataset.dataset("signals")
+    dataset.dataset_teste2("signals")
 
-    if make_model:
+    if model_path is None:
         model = Autoencoder(dataset.data)
         model.fit(dataset.data)
-        # !!! save() writes last model in the same folder !!!
         model.save("model")
     else:
         model = Autoencoder()
-        model.load("model")
+        model.load(model_path)
     prediction = model.predict(dataset.data)
     np.save("results/prediction.npy", prediction)
 
     df = pd.DataFrame()
 
-    min_cluster_sizes = [5]
-    min_samples = [2, 3, 5, 8, 13]
+    min_cluster_sizes = [10]
+    min_samples = [10]
     for min_cluster_size in min_cluster_sizes:
         for min_sample in min_samples:
 

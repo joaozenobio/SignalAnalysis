@@ -17,34 +17,24 @@ class Autoencoder:
 
     def build_autoencoder(self, data):
         self.model = Sequential()
-        self.model.add(LSTM(90, activation="sigmoid", return_sequences=True, input_shape=(data.shape[1], data.shape[2])))
-        # self.model.add(LSTM(120, activation="sigmoid", return_sequences=True))
-        # self.model.add(Dropout(rate=0.1))
-        # self.model.add(LSTM(150, activation="sigmoid", return_sequences=True))
-        # self.model.add(Dropout(rate=0.1))
-        # self.model.add(LSTM(180, activation="sigmoid", return_sequences=True))
-        # self.model.add(Dropout(rate=0.1))
-        # self.model.add(LSTM(150, activation="sigmoid", return_sequences=True))
-        # self.model.add(Dropout(rate=0.1))
-        # self.model.add(LSTM(120, activation="sigmoid", return_sequences=True))
-        # self.model.add(Dropout(rate=0.1))
-        # self.model.add(LSTM(90, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(80, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(70, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(60, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(50, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(40, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(30, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(20, activation="sigmoid", name='encoder_output'))
+        self.model.add(LSTM(90, return_sequences=True,
+                            input_shape=(data.shape[1], data.shape[2])))
+        self.model.add(LSTM(80, return_sequences=True))
+        self.model.add(LSTM(70, return_sequences=True))
+        self.model.add(LSTM(60, return_sequences=True))
+        self.model.add(LSTM(50, return_sequences=True))
+        self.model.add(LSTM(40, return_sequences=True))
+        self.model.add(LSTM(30, return_sequences=True))
+        self.model.add(LSTM(20, name='encoder_output'))
         self.model.add(RepeatVector(data.shape[1]))
-        self.model.add(LSTM(20, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(30, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(40, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(50, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(60, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(70, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(80, activation="sigmoid", return_sequences=True))
-        self.model.add(LSTM(90, activation="sigmoid", return_sequences=True))
+        self.model.add(LSTM(20, return_sequences=True))
+        self.model.add(LSTM(30, return_sequences=True))
+        self.model.add(LSTM(40, return_sequences=True))
+        self.model.add(LSTM(50, return_sequences=True))
+        self.model.add(LSTM(60, return_sequences=True))
+        self.model.add(LSTM(70, return_sequences=True))
+        self.model.add(LSTM(80, return_sequences=True))
+        self.model.add(LSTM(90, return_sequences=True))
         self.model.add(TimeDistributed(Dense(data.shape[1])))
         self.model.compile(loss="mse", optimizer="adam")
 
@@ -55,14 +45,14 @@ class Autoencoder:
         plot_model(self.model, show_shapes=True, show_dtype=True, show_layer_names=False, expand_nested=True,
                    show_layer_activations=True)
 
-    def fit(self, data, epochs=10, batch_size=1, verbose=1):
+    def fit(self, data, epochs=3, batch_size=1, verbose=1):
         self.model.fit(x=data, y=data, epochs=epochs, batch_size=batch_size, verbose=verbose)
 
     def save(self, directory):
-        self.model.save(f'./{directory}')
+        self.model.save(directory)
 
     def load(self, directory):
-        self.model = load_model(f'./{directory}')
+        self.model = load_model(directory)
 
     def predict(self, data):
         encoder = Model(inputs=self.model.inputs, outputs=self.model.get_layer("encoder_output").output)
