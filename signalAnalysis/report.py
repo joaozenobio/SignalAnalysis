@@ -1,5 +1,3 @@
-from Dataset import Dataset
-
 import pandas as pd
 import numpy as np
 import os
@@ -18,7 +16,8 @@ import imageio
 
 def evaluate(prediction, labels):
     """
-        Function to evaluate the results of a clustering method suing Point Biserial and AUCC for clustering.
+        Function to evaluate the results of a clustering method using Point Biserial,
+        AUCC and silhouette for clustering.
     """
 
     from scipy.spatial.distance import pdist
@@ -83,57 +82,52 @@ def report():
         report.loc[len(report)] = [method] + list(evaluate(prediction, labels))
     report.to_csv(f"report/report.csv")
 
-    df = pd.read_csv('report/report.csv', index_col=0)[['Method', 'AUCC', 'Silhouette']]
-    max1, max2, max3 = ('', 0), ('', 0), ('', 0)
-    for method, aucc, silhouette in zip(df.values[:, 0], df.values[:, 1], df.values[:, 2]):
-        for alpha in [0.1, 0.5, 0.9]:
-            score = alpha*aucc + (1-alpha)*silhouette
-            if alpha == 0.1 and max1[1] < score:
-                max1 = (method, score)
-            if alpha == 0.5 and max2[1] < score:
-                max2 = (method, score)
-            if alpha == 0.9 and max3[1] < score:
-                max3 = (method, score)
-    print(max1, max2, max3)
+    df = pd.read_csv('report/report.csv', index_col=0)[['Method', 'PB', 'AUCC', 'Silhouette']]
+
+    method_avg = ''
+    avg = 0
+    for method, pb, aucc, silhouette in zip(df.values[:, 0], df.values[:, 1], df.values[:, 2], df.values[:, 3]):
+        avg_temp = (abs(pb) * aucc * silhouette) / 3
+        if avg_temp > avg:
+            avg = avg_temp
+            method_avg = method
 
     print('Plotting')
     tsne_results = TSNE(n_components=2, learning_rate='auto', init='random', perplexity=50)
     tsne_2d = tsne_results.fit_transform(prediction)
     tsne_2d = pd.DataFrame({'x': tsne_2d[:, 0], 'y': tsne_2d[:, 1]})
-    for method in [max1[0], max2[0], max3[0]]:
-        tsne_2d['label'] = results[method].values
-        tsne_2d['true_label'] = original_data['label'].values
-        fig, ax = plt.subplots(figsize=(15, 15))
-        scatter = ax.scatter(data=tsne_2d, x='x', y='y', c='label', cmap='jet', alpha=0.5)
-        for label in set(tsne_2d['label'].values):
-            x = tsne_2d.where(tsne_2d['label'] == label).dropna()['x'].median()
-            y = tsne_2d.where(tsne_2d['label'] == label).dropna()['y'].median()
-            center = (x, y)
-            ax.annotate(str(label), xy=center, size=10, bbox=dict(boxstyle="circle", facecolor='grey'))
-        print(method)
-        for label in set(tsne_2d['true_label'].values):
-            print(f'{label}:', np.histogram(
-                tsne_2d.where(tsne_2d['true_label'] == label).dropna()['label'].values,
-                bins=list(range(max(tsne_2d['label'].values)+2))
-            ))
-        plt.savefig(f'report/{method}.png', dpi=100)
-        plt.close(fig)
+    tsne_2d['label'] = results[method_avg].values
+    tsne_2d['true_label'] = original_data['label'].values
+    fig, ax = plt.subplots(figsize=(15, 15))
+    scatter = ax.scatter(data=tsne_2d, x='x', y='y', c='label', cmap='jet', alpha=0.5)
+    for label in set(tsne_2d['label'].values):
+        x = tsne_2d.where(tsne_2d['label'] == label).dropna()['x'].median()
+        y = tsne_2d.where(tsne_2d['label'] == label).dropna()['y'].median()
+        center = (x, y)
+        ax.annotate(str(label), xy=center, size=10, bbox=dict(boxstyle="circle", facecolor='grey'))
+    print(method_avg)
+    for label in set(tsne_2d['true_label'].values):
+        print(f'{label}:', np.histogram(
+            tsne_2d.where(tsne_2d['true_label'] == label).dropna()['label'].values,
+            bins=list(range(max(tsne_2d['label'].values)+2))
+        ))
+    plt.savefig(f'report/{method_avg}.png', dpi=100)
+    plt.close(fig)
 
     print('Plotting examples from clusters')
-    for method in [max1[0], max2[0], max3[0]]:
-        labels = results[method].values
-        for cluster in set(labels):
-            data = original_data.iloc[[True if label == cluster else False for label in labels]]
-            data = data.reset_index(drop=True).values
-            side_size = 6
-            fig, ax = plt.subplots(side_size, side_size, figsize=(30, 30))
-            rand_index = np.floor(np.linspace(0, data.shape[0]-1, side_size**2))
-            for i in range(side_size**2):
-                ax[int(np.floor(i / side_size)), int(i % side_size)].plot(
-                    data[int(rand_index[i])]
-                )
-                ax[int(np.floor(i / side_size)), int(i % side_size)].set_title(
-                    original_data.index.values.tolist()[int(rand_index[i])]
-                )
-            plt.savefig(f'cluster_examples/{method}_label_{cluster}.png', dpi=100)
-            plt.close()
+    labels = results[method_avg].values
+    for cluster in set(labels):
+        data = original_data.iloc[[True if label == cluster else False for label in labels]]
+        data = data.reset_index(drop=True).values
+        side_size = 6
+        fig, ax = plt.subplots(side_size, side_size, figsize=(30, 30))
+        rand_index = np.floor(np.linspace(0, data.shape[0]-1, side_size**2))
+        for i in range(side_size**2):
+            ax[int(np.floor(i / side_size)), int(i % side_size)].plot(
+                data[int(rand_index[i])]
+            )
+            ax[int(np.floor(i / side_size)), int(i % side_size)].set_title(
+                original_data.index.values.tolist()[int(rand_index[i])]
+            )
+        plt.savefig(f'cluster_examples/{method_avg}_label_{cluster}.png', dpi=100)
+        plt.close()

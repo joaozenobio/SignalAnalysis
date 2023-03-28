@@ -17,7 +17,7 @@ def run(model_path=None):
     os.makedirs("./results", exist_ok=True)
 
     dataset = Dataset()
-    dataset.dataset_teste2("signals")
+    dataset.dataset_teste_grande("signals")
 
     if model_path is None:
         model = Autoencoder(dataset.data)
@@ -31,8 +31,8 @@ def run(model_path=None):
 
     df = pd.DataFrame()
 
-    min_cluster_sizes = [10]
-    min_samples = [10]
+    min_cluster_sizes = [5, 10, 15, 20, 25, 30]
+    min_samples = [5, 10, 15, 20, 25, 30]
     for min_cluster_size in min_cluster_sizes:
         for min_sample in min_samples:
 
