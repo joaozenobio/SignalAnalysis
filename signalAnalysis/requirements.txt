@@ -1,5 +1,4 @@
 scipy
-hdbscan
 sklearn
 plotly
 pandas
@@ -11,3 +10,4 @@ pydot
 graphviz
 joblib
 tensorflow
+pydub
