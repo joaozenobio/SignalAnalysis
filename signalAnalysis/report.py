@@ -13,6 +13,8 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 import imageio
 
+from Dataset import Dataset
+
 
 def evaluate(prediction, labels):
     """
@@ -131,3 +133,37 @@ def report():
             )
         plt.savefig(f'cluster_examples/{method_avg}_label_{cluster}.png', dpi=100)
         plt.close()
+
+
+# os.makedirs("./old/means", exist_ok=True)
+# results = pd.read_csv("./old/results_old/results.csv", index_col=0)
+# dataset = Dataset()
+# dataset.dataset('./old/signals_old')
+# original_data = pd.DataFrame(dataset.data.squeeze())
+# labels = results["FOSC_96_average"].values
+# i = 0
+# fig, ax = plt.subplots(5, 3, figsize=(15, 20), sharex=True, sharey=True)
+# ax_list = ax.reshape(-1)
+# plt.locator_params(nbins=10)
+# for cluster in set(labels):
+#     data = original_data.iloc[[True if label == cluster else False for label in labels]]
+#     data = data.reset_index(drop=True).values
+#     ax_list[i].plot(data.mean(axis=0))
+#     ax_list[i].set(title=f'Cluster{i}')
+#     i += 1
+# plt.savefig('./old/means/FOSC_96_avarage_mean.png', dpi=100)
+# plt.close()
+#
+# i = 0
+# fig, ax = plt.subplots(5, 3, figsize=(15, 20), sharex=True, sharey=True)
+# ax_list = ax.reshape(-1)
+# plt.locator_params(nbins=10)
+# for cluster in set(labels):
+#     data = original_data.iloc[[True if label == cluster else False for label in labels]]
+#     data = data.reset_index(drop=True).values
+#     for signal in data:
+#         ax_list[i].plot(signal, alpha=0.02)
+#     ax_list[i].set(title=f'Cluster{i}')
+#     i += 1
+# plt.savefig('./old/means/FOSC_96_avarage_all.png', dpi=100)
+# plt.close()

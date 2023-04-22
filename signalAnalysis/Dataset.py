@@ -70,17 +70,17 @@ class Dataset:
         data = minmax_scale(data.values, feature_range=(0, 1), axis=1)
         self.data = data.reshape(data.shape[0], data.shape[1], 1)
 
-import matplotlib.pyplot as plt
-import matplotlib.patches as patches
-
-
-df = pd.read_csv("old/signals_old/result_5YzozaP.csv", index_col=0).squeeze("columns").map(abs)[0:91]
-df = df.diff()
-df = pd.DataFrame(minmax_scale(df.values, feature_range=(-1, 1)))[1:]
-fig, ax = plt.subplots(figsize=(15, 15))
-ax.plot(df, linewidth=3)
-# for i in range(0, len(df)-89, 50):
-#     color = np.random.rand(3,)
-#     rect = patches.Rectangle((i, min(df)), 90, max(df)-min(df), linewidth=3, edgecolor=color, facecolor='none', zorder=i)
-#     ax.add_patch(rect)
-plt.savefig(f'old/signals_old/sinal_processado.jpg', dpi=100)
+# import matplotlib.pyplot as plt
+# import matplotlib.patches as patches
+#
+#
+# df = pd.read_csv("old/signals_old/result_5YzozaP.csv", index_col=0).squeeze("columns").map(abs)[0:91]
+# df = df.diff()
+# df = pd.DataFrame(minmax_scale(df.values, feature_range=(-1, 1)))[1:]
+# fig, ax = plt.subplots(figsize=(15, 15))
+# ax.plot(df, linewidth=3)
+# # for i in range(0, len(df)-89, 50):
+# #     color = np.random.rand(3,)
+# #     rect = patches.Rectangle((i, min(df)), 90, max(df)-min(df), linewidth=3, edgecolor=color, facecolor='none', zorder=i)
+# #     ax.add_patch(rect)
+# plt.savefig(f'old/signals_old/sinal_processado.jpg', dpi=100)
