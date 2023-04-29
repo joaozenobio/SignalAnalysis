@@ -57,7 +57,7 @@ def evaluate(prediction, labels):
                 x.append(0)
 
     # Compute internal validity index (point biserial)
-    pb, pv = pointbiserialr(x, yPointBiserial)
+    # pb, pv = pointbiserialr(x, yPointBiserial)
 
     # Compute area under the curve
     aucc = 0
@@ -66,7 +66,7 @@ def evaluate(prediction, labels):
 
     silhouette = silhouette_score(prediction, labels)
 
-    return penalty*pb, penalty*aucc, penalty*silhouette, noiseSize, penalty
+    return 0., penalty*aucc, penalty*silhouette, noiseSize, penalty
 
 
 def report():
@@ -135,25 +135,42 @@ def report():
         plt.close()
 
 
-# os.makedirs("./old/means", exist_ok=True)
-# results = pd.read_csv("./old/results_old/results.csv", index_col=0)
-# dataset = Dataset()
-# dataset.dataset('./old/signals_old')
-# original_data = pd.DataFrame(dataset.data.squeeze())
-# labels = results["FOSC_96_average"].values
-# i = 0
-# fig, ax = plt.subplots(5, 3, figsize=(15, 20), sharex=True, sharey=True)
-# ax_list = ax.reshape(-1)
-# plt.locator_params(nbins=10)
-# for cluster in set(labels):
-#     data = original_data.iloc[[True if label == cluster else False for label in labels]]
-#     data = data.reset_index(drop=True).values
-#     ax_list[i].plot(data.mean(axis=0))
-#     ax_list[i].set(title=f'Cluster{i}')
-#     i += 1
-# plt.savefig('./old/means/FOSC_96_avarage_mean.png', dpi=100)
-# plt.close()
-#
+os.makedirs("./old/means", exist_ok=True)
+results = pd.read_csv("./old/results_old/results_new_FOSC_96.csv", index_col=0)
+lastObjects = pd.read_csv("./old/results_old/lastObjects_FOSC_96.csv", index_col=0)
+dataset = Dataset()
+dataset.dataset('./old/signals_old')
+original_data = pd.DataFrame(dataset.data.squeeze())
+labels = results["0"].values
+prediction = np.load("./old/results_old/prediction.npy")
+
+df_report = pd.DataFrame(columns=["PB", "AUCC", "Silhouette", "Noise", "Penalty"])
+for column, result in zip(df_report.columns, evaluate(prediction, labels)):
+    df_report[column] = result
+print(df_report)
+
+i = 0
+fig, ax = plt.subplots(5, 3, figsize=(15, 20), sharex=True, sharey=True)
+ax_list = ax.reshape(-1)
+plt.locator_params(nbins=10)
+for cluster in lastObjects.index:
+    data = original_data.iloc[lastObjects.loc[cluster][0]]
+    data = data.reset_index(drop=True).values
+    ax_list[i].plot(data)
+    ax_list[i].set(title=f'Cluster_{i}_example')
+    i += 1
+plt.savefig(f'./old/means/FOSC_96_avarage_last_objects.jpg', dpi=100)
+plt.close()
+
+tsne_results = TSNE(n_components=2, learning_rate='auto', init='random', perplexity=50)
+tsne_2d = tsne_results.fit_transform(prediction)
+tsne_2d = pd.DataFrame({'x': tsne_2d[:, 0], 'y': tsne_2d[:, 1]})
+tsne_2d['label'] = labels
+fig, ax = plt.subplots(figsize=(15, 15))
+scatter = ax.scatter(data=tsne_2d, x='x', y='y', c='label', cmap='jet', alpha=0.5)
+plt.savefig(f'./old/means/FOSC_96_avarage_TSNE2D', dpi=100)
+plt.close(fig)
+
 # i = 0
 # fig, ax = plt.subplots(5, 3, figsize=(15, 20), sharex=True, sharey=True)
 # ax_list = ax.reshape(-1)

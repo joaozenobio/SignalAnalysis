@@ -1,4 +1,4 @@
-from teste_grande import *
+from teste_audio import *
 from run import *
 from report import *
 from datetime import datetime

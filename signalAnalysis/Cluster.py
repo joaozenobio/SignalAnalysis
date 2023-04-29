@@ -1,5 +1,6 @@
 import numpy as np
 
+
 class Cluster:
     '''
     __init()__ Creates a new Cluster.
@@ -22,7 +23,6 @@ class Cluster:
         self.propagatedLowestChildDeathLevel = np.Inf
         self.virtualChildCluster = []
 
-
         # Store objects ids information
         self.numberofLabeledInNode = 0
         self.objects = []
@@ -34,10 +34,8 @@ class Cluster:
         if self.parent != None:
             self.parent.hasChildren = True
 
-
         self.propagatedDescendants = []
         self.children = []
-
 
     ''' --------------------- Public methods ---------------------'''
     ''' detachPoints
@@ -50,13 +48,12 @@ class Cluster:
 
     def detachPoints(self, numPoints, level):
         self.numPoints -= numPoints
-        self.stability += (numPoints * (self.birthLevel-level))
+        self.stability += (numPoints * (self.birthLevel - level))
 
         if self.numPoints == 0:
             self.deathLevel = level
         elif self.numPoints < 0:
             raise Exception("Cluster cannot have less than 0 points.")
-
 
     ''' propagate
     This cluster will propagate itself to its parent if its number of satisfied constraints is
@@ -72,10 +69,8 @@ class Cluster:
             if self.propagatedLowestChildDeathLevel == np.Inf:
                 self.propagatedLowestChildDeathLevel = self.deathLevel
 
-
             if self.propagatedLowestChildDeathLevel < self.parent.propagatedLowestChildDeathLevel:
                 self.parent.propagatedLowestChildDeathLevel = self.propagatedLowestChildDeathLevel
-
 
             if not self.hasChildren:
                 self.parent.propagatedStability += self.stability
@@ -97,11 +92,11 @@ class Cluster:
     def addPointsToVirtualChildCluster(self, points):
         self.virtualChildCluster = (self.virtualChildCluster + points).copy()
 
-
     '''
     virtualChildClusterContaintsPoint
     Check if a virtual child cluster contains a specific point
     '''
+
     def virtualChildClusterContaintsPoint(self, point):
         return (point in self.virtualChildCluster)
 
@@ -109,6 +104,7 @@ class Cluster:
     addChild
     add constraint satisfaction for a cluster node
     '''
+
     def addChild(self, ch):
         self.children.append(ch)
 
@@ -118,6 +114,7 @@ class Cluster:
     Only call this method after computing the number of constraints
     satisfied by the virtual child cluster.
      '''
+
     def releaseVirtualChildCluster(self):
         self.virtualChildCluster = []
 
@@ -168,13 +165,16 @@ class Cluster:
     def getClassDistribution(self):
         return self.classDistributionInNode
 
-
     def __str__(self):
         if self.parent != None:
-            return "\nId: " + str(self.label) + " Parent: " + str(self.parent.label) + " Stability: " + "{:.4f}".format(self.stability) + " isLeaf? " + str(not self.hasChildren) + " Birth Level: " + "{:.4f}".format(self.birthLevel) + " Death Level: " + "{:.4f}".format(self.deathLevel) + " Num obj: " + str(len(self.objects))
+            return "\nId: " + str(self.label) + " Parent: " + str(self.parent.label) + " Stability: " + "{:.4f}".format(
+                self.stability) + " isLeaf? " + str(not self.hasChildren) + " Birth Level: " + "{:.4f}".format(
+                self.birthLevel) + " Death Level: " + "{:.4f}".format(self.deathLevel) + " Num obj: " + str(
+                len(self.objects))
         else:
-            return "\nId: " + str(self.label) + " isLeaf? " + str(not self.hasChildren) + " Birth Level: Inf" + " Death Level: " + "{:.4f}".format(self.deathLevel) + " Num obj: " + str(len(self.objects))
-
+            return "\nId: " + str(self.label) + " isLeaf? " + str(
+                not self.hasChildren) + " Birth Level: Inf" + " Death Level: " + "{:.4f}".format(
+                self.deathLevel) + " Num obj: " + str(len(self.objects))
 
     def __repr__(self):
         return str(self)
