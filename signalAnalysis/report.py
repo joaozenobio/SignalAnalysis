@@ -37,7 +37,7 @@ def evaluate(prediction, labels):
 
     dm = squareform(distance_matrix)
     x = []
-    yPointBiserial = []
+    # yPointBiserial = []
     yAucc = []
 
     for i in range(len(labels) - 1):
@@ -48,7 +48,7 @@ def evaluate(prediction, labels):
             if labels[j] == 0:
                 continue
 
-            yPointBiserial.append(dm[i, j])
+            # yPointBiserial.append(dm[i, j])
             yAucc.append(1/(1+dm[i, j]))
 
             if labels[i] == labels[j]:
@@ -144,10 +144,7 @@ original_data = pd.DataFrame(dataset.data.squeeze())
 labels = results["0"].values
 prediction = np.load("./old/results_old/prediction.npy")
 
-df_report = pd.DataFrame(columns=["PB", "AUCC", "Silhouette", "Noise", "Penalty"])
-for column, result in zip(df_report.columns, evaluate(prediction, labels)):
-    df_report[column] = result
-print(df_report)
+print(evaluate(prediction, labels))
 
 i = 0
 fig, ax = plt.subplots(5, 3, figsize=(15, 20), sharex=True, sharey=True)
@@ -168,6 +165,12 @@ tsne_2d = pd.DataFrame({'x': tsne_2d[:, 0], 'y': tsne_2d[:, 1]})
 tsne_2d['label'] = labels
 fig, ax = plt.subplots(figsize=(15, 15))
 scatter = ax.scatter(data=tsne_2d, x='x', y='y', c='label', cmap='jet', alpha=0.5)
+for label in set(tsne_2d['label'].values):
+    if label != 0:
+        x = tsne_2d.where(tsne_2d['label'] == label).dropna()['x'].median()
+        y = tsne_2d.where(tsne_2d['label'] == label).dropna()['y'].median()
+        center = (x, y)
+        ax.annotate(str(label), xy=center, size=10, bbox=dict(boxstyle="circle", facecolor='grey'))
 plt.savefig(f'./old/means/FOSC_96_avarage_TSNE2D', dpi=100)
 plt.close(fig)
 
