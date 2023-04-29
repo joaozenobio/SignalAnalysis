@@ -152,7 +152,7 @@ for cluster in lastObjects.index:
     data = data.reset_index(drop=True).values
     ax.plot(data)
     ax.set(title=f'Cluster_{cluster}_example')
-    plt.savefig(f'./old/means/FOSC_96_avarage_last_object_{cluster}.jpg', dpi=200)
+    plt.savefig(f'./old/means/FOSC_96_average_last_object_{cluster}.jpg', dpi=200)
     plt.close()
 
 tsne_results = TSNE(n_components=2, learning_rate='auto', init='random', perplexity=50)
@@ -167,7 +167,7 @@ for label in set(tsne_2d['label'].values):
         y = tsne_2d.where(tsne_2d['label'] == label).dropna()['y'].median()
         center = (x, y)
         ax.annotate(str(label), xy=center, size=10, bbox=dict(boxstyle="circle", facecolor='grey'))
-plt.savefig(f'./old/means/FOSC_96_avarage_TSNE2D', dpi=100)
+plt.savefig(f'./old/means/FOSC_96_average_TSNE2D', dpi=100)
 plt.close(fig)
 
 # i = 0
