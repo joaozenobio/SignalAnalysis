@@ -135,40 +135,40 @@ def report():
         plt.close()
 
 
-# os.makedirs("./old/means", exist_ok=True)
-# results = pd.read_csv("./old/results_old/results_new_FOSC_96.csv", index_col=0)
-# lastObjects = pd.read_csv("./old/results_old/lastObjects_FOSC_96.csv", index_col=0)
-# dataset = Dataset()
-# dataset.dataset('./old/signals_old')
-# original_data = pd.DataFrame(dataset.data.squeeze())
-# labels = results["0"].values
-# prediction = np.load("./old/results_old/prediction.npy")
+os.makedirs("./old/means", exist_ok=True)
+results = pd.read_csv("./old/results_old/results_new_FOSC_96.csv", index_col=0)
+lastObjects = pd.read_csv("./old/results_old/lastObjects_FOSC_96.csv", index_col=0)
+dataset = Dataset()
+dataset.dataset('./old/signals_old')
+original_data = pd.DataFrame(dataset.data.squeeze())
+labels = results["0"].values
+prediction = np.load("./old/results_old/prediction.npy")
 
 # print(evaluate(prediction, labels))
 
-# for cluster in lastObjects.index:
-#     fig, ax = plt.subplots(figsize=(15, 20))
-#     data = original_data.iloc[lastObjects.loc[cluster][0]]
-#     data = data.reset_index(drop=True).values
-#     ax.plot(data)
-#     ax.set(title=f'Cluster_{cluster}_example')
-#     plt.savefig(f'./old/means/FOSC_96_avarage_last_object_{cluster}.jpg', dpi=200)
-#     plt.close()
-#
-# tsne_results = TSNE(n_components=2, learning_rate='auto', init='random', perplexity=50)
-# tsne_2d = tsne_results.fit_transform(prediction)
-# tsne_2d = pd.DataFrame({'x': tsne_2d[:, 0], 'y': tsne_2d[:, 1]})
-# tsne_2d['label'] = labels
-# fig, ax = plt.subplots(figsize=(15, 15))
-# scatter = ax.scatter(data=tsne_2d, x='x', y='y', c='label', cmap='jet', alpha=0.5)
-# for label in set(tsne_2d['label'].values):
-#     if label != 0:
-#         x = tsne_2d.where(tsne_2d['label'] == label).dropna()['x'].median()
-#         y = tsne_2d.where(tsne_2d['label'] == label).dropna()['y'].median()
-#         center = (x, y)
-#         ax.annotate(str(label), xy=center, size=10, bbox=dict(boxstyle="circle", facecolor='grey'))
-# plt.savefig(f'./old/means/FOSC_96_avarage_TSNE2D', dpi=100)
-# plt.close(fig)
+for cluster in lastObjects.index:
+    fig, ax = plt.subplots(figsize=(15, 15))
+    data = original_data.iloc[lastObjects.loc[cluster][0]]
+    data = data.reset_index(drop=True).values
+    ax.plot(data)
+    ax.set(title=f'Cluster_{cluster}_example')
+    plt.savefig(f'./old/means/FOSC_96_avarage_last_object_{cluster}.jpg', dpi=200)
+    plt.close()
+
+tsne_results = TSNE(n_components=2, learning_rate='auto', init='random', perplexity=50)
+tsne_2d = tsne_results.fit_transform(prediction)
+tsne_2d = pd.DataFrame({'x': tsne_2d[:, 0], 'y': tsne_2d[:, 1]})
+tsne_2d['label'] = labels
+fig, ax = plt.subplots(figsize=(15, 15))
+scatter = ax.scatter(data=tsne_2d, x='x', y='y', c='label', cmap='jet', alpha=0.5)
+for label in set(tsne_2d['label'].values):
+    if label != 0:
+        x = tsne_2d.where(tsne_2d['label'] == label).dropna()['x'].median()
+        y = tsne_2d.where(tsne_2d['label'] == label).dropna()['y'].median()
+        center = (x, y)
+        ax.annotate(str(label), xy=center, size=10, bbox=dict(boxstyle="circle", facecolor='grey'))
+plt.savefig(f'./old/means/FOSC_96_avarage_TSNE2D', dpi=100)
+plt.close(fig)
 
 # i = 0
 # fig, ax = plt.subplots(5, 3, figsize=(15, 20), sharex=True, sharey=True)
